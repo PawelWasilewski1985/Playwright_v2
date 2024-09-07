@@ -1,5 +1,4 @@
 import { expect, test } from "@playwright/test";
-import utils from "./utils/utilsMethods";
 import { HomePageEcommerce } from "./pages/ecommerceHomePage";
 import { BrowserSetup } from "./utils/browserSetup";
 import { LoggedUserPage } from "./pages/ecommerceLoggedUserPage";

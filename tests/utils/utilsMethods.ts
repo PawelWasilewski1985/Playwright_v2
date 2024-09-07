@@ -1,11 +1,28 @@
 import { Locator, Page } from '@playwright/test';
 import fs from 'fs/promises';
+import { expect, PlaywrightTestArgs } from '@playwright/test';
 
 class Utils {
-  private static EMAILS_FILE_PATH = "C:/Users/Admin/Documents/Playwright_v2/tests/utils/emails.txt";
+
+  private static EMAILS_FILE_PATH = "C:/Users/Admin/Documents/Playwright_v2/tests/utils/emails_to_login.txt";
+  //private static EMAILS_FILE_PATH = "C:/Users/Admin/Documents/Playwright_v2/tests/utils/emails_to_login.txt";
 
   public static async saveEmail(email: string): Promise<void> {
-    await fs.appendFile(Utils.EMAILS_FILE_PATH, email + '\n');
+  await fs.appendFile(Utils.EMAILS_FILE_PATH, email + '\n');
+  }
+
+
+
+  public static async getTextByXPath(page: Page, xpath: string): Promise<string | null> {
+    try {
+      const element = await page.waitForSelector(`xpath=${xpath}`);
+      if (element) {
+        return await element.textContent();
+      }
+    } catch (error) {
+      console.error(`Error while getting text using XPath: ${xpath}`, error);
+    }
+    return null;
   }
 
   public static async getEmailFromFile(): Promise<string> {
@@ -25,9 +42,24 @@ class Utils {
     return nineDigitNumber.toString().padStart(9, '0');
   }
 
-  static async elementExists(page: Page, locator: string): Promise<boolean> {
+  // static async elementExists(page: Page, locator: string): Promise<boolean> {
+  //   const element = await page.$(locator);
+  //   return !!element;
+  // }
+
+  static async isElementVisible(page: Page, locator: string): Promise<boolean> {
     const element = await page.$(locator);
-    return !!element;
+    if (!element) {
+      throw new Error(`Element not found with locator: ${locator}`);
+    }
+    return await element.isVisible();
+  }
+
+  static async elementExists(page: Page, locator: string): Promise<void> {
+    const element = await page.$(locator);
+    if (!element) {
+      throw new Error(`Element not found with locator: ${locator}`);
+    }
   }
 
   static async countElements(page: Page, locator: Locator): Promise<number> {
@@ -54,9 +86,35 @@ class Utils {
     return randomNumberFromList;
   }
 
+  static async checkElementContainsText(page: Page, locator: string, expectedText: string): Promise<void> {
+    const element = await page.$(locator);
+    expect(element).not.toBeNull();
+    if (element) {
+      const textContent = await element.textContent();
+      expect(textContent).toContain(expectedText);
+      console.log(`Element with locator "${locator}" contains the expected text: ${expectedText}`);
+    } else {
+      throw new Error(`Element with locator "${locator}" not found.`);
+    }
+  }
+  static async getCurrentURL(page: Page): Promise<string> {
+    return page.url();
+  }
 
+  static async assertURL(page: Page, expectedURL: string): Promise<void> {
+    const currentURL = await Utils.getCurrentURL(page);
+    expect(currentURL).toBe(expectedURL);
+  }
 
-
+  static async clickIfExists(page: Page, selector: string): Promise<void> {
+    const element = await page.$(selector);
+    if (element) {
+        console.log(`Element with selector "${selector}" exists, clicking...`);
+        await element.click();
+    } else {
+        console.log(`Element with selector "${selector}" does not exist, continuing...`);
+    }
+}
 
 }
 

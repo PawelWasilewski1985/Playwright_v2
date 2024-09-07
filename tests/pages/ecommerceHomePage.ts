@@ -11,6 +11,7 @@ export class HomePageEcommerce {
 
     async open() {
         await this.page.goto('https://ecommerce-playground.lambdatest.io/');
+        
     }
 
     async clickOnLogin() {
@@ -29,7 +30,6 @@ export class HomePageEcommerce {
 
     async clickOnLoginButton() {
         await this.page.getByRole('button', { name: 'Login' }).click();
-        //await this.page.pause();
     }
 
     async goToSettings() {
@@ -50,7 +50,7 @@ export class HomePageEcommerce {
         const emailField = await this.page.getByPlaceholder("E-Mail");
         await emailField.fill("email" + random + "@test.email");
         let emailValue = await emailField.inputValue();
-        await utils.saveEmail(emailValue);
+        //await utils.saveEmail(emailValue);
         console.log("============" + emailValue)
         await this.page.locator('#input-telephone').fill(randomPhoneNumber);
        // await this.page.waitForTimeout(1000);

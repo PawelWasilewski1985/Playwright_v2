@@ -6,10 +6,12 @@ export class BrowserSetup {
   private static page: Page;
 
   public static async initialize(): Promise<void> {
-    BrowserSetup.browser = await chromium.launch();
-    BrowserSetup.context = await BrowserSetup.browser.newContext();
-    BrowserSetup.page = await BrowserSetup.context.newPage();
-  }
+    if (!BrowserSetup.browser) {
+        BrowserSetup.browser = await chromium.launch();
+        BrowserSetup.context = await BrowserSetup.browser.newContext();
+        BrowserSetup.page = await BrowserSetup.context.newPage();
+    }
+}
 
   public static getPage(): Page {
     return BrowserSetup.page;
